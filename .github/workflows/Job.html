@@ -1,0 +1,237 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+
+      # Runs a single command using the runners shell
+      - name: Run a one-line script
+        run: echo Hello, world!
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pro Job Sheet Generator</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f2f2f2;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        input, textarea {
+            width: 100%;
+            margin: 5px 0;
+            padding: 8px;
+        }
+
+        button {
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        #output {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            background: white;
+            margin: 20px auto;
+            box-shadow: 0 0 10px gray;
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid black;
+            margin-bottom: 10px;
+        }
+
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .section {
+            margin-top: 10px;
+        }
+
+        .section b {
+            display: block;
+        }
+
+        img {
+            height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>📄 Pro Job Sheet Generator</h2>
+
+<label>Institute Name:</label>
+<input type="text" id="institute">
+
+<label>Upload Logo:</label>
+<input type="file" id="logo">
+
+<label>Student Name:</label>
+<input type="text" id="name">
+
+<label>Roll:</label>
+<input type="text" id="roll">
+
+<label>Trade:</label>
+<input type="text" id="trade">
+
+<label>Title:</label>
+<input type="text" id="title">
+
+<label>Objective:</label>
+<textarea id="objective"></textarea>
+
+<label>Theory:</label>
+<textarea id="theory"></textarea>
+
+<label>Tools:</label>
+<textarea id="tools"></textarea>
+
+<label>Procedure:</label>
+<textarea id="procedure"></textarea>
+
+<label>Precautions:</label>
+<textarea id="precautions"></textarea>
+
+<label>Comments:</label>
+<textarea id="comments"></textarea>
+
+<button onclick="generate()">Generate</button>
+<button onclick="downloadPDF()">Download PDF</button>
+<button onclick="printSheet()">Print</button>
+
+</div>
+
+<div id="output"></div>
+
+<script>
+// Auto Save
+const inputs = document.querySelectorAll("input, textarea");
+
+inputs.forEach(input => {
+    input.addEventListener("input", () => {
+        localStorage.setItem(input.id, input.value);
+    });
+
+    if(localStorage.getItem(input.id)) {
+        input.value = localStorage.getItem(input.id);
+    }
+});
+
+// Logo preview
+let logoData = "";
+
+document.getElementById("logo").addEventListener("change", function() {
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        logoData = e.target.result;
+    }
+    reader.readAsDataURL(this.files[0]);
+});
+
+function generate() {
+    let date = new Date().toLocaleDateString();
+
+    let html = `
+        <div class="header">
+            ${logoData ? `<img src="${logoData}">` : ""}
+            <div class="title">${institute.value}</div>
+            <div><b>${title.value}</b></div>
+        </div>
+
+        <div class="info">
+            <div>Name: ${name.value}</div>
+            <div>Roll: ${roll.value}</div>
+        </div>
+
+        <div class="info">
+            <div>Trade: ${trade.value}</div>
+            <div>Date: ${date}</div>
+        </div>
+
+        <div class="section"><b>Objective:</b> ${objective.value}</div>
+        <div class="section"><b>Theory:</b> ${theory.value}</div>
+        <div class="section"><b>Tools:</b> ${tools.value}</div>
+        <div class="section"><b>Procedure:</b> ${procedure.value}</div>
+        <div class="section"><b>Precautions:</b> ${precautions.value}</div>
+        <div class="section"><b>Comments:</b> ${comments.value}</div>
+    `;
+
+    document.getElementById("output").innerHTML = html;
+}
+
+function downloadPDF() {
+    let element = document.getElementById("output");
+    html2pdf().from(element).save("Job_Sheet.pdf");
+}
+
+function printSheet() {
+    let printContents = document.getElementById("output").innerHTML;
+    let win = window.open('', '', 'height=800,width=800');
+    win.document.write('<html><head><title>Print</title></head><body>');
+    win.document.write(printContents);
+    win.document.write('</body></html>');
+    win.document.close();
+    win.print();
+}
+</script>
+
+</body>
+</html>
+
